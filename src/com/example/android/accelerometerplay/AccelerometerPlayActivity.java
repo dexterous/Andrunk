@@ -158,7 +158,7 @@ public class AccelerometerPlayActivity extends Activity {
             private float mOneMinusFriction;
 
             Particle() {
-                final float r = 0.5f;
+                final float r = 0.05f;
                 mOneMinusFriction = 1.0f - sFriction + r;
             }
 
