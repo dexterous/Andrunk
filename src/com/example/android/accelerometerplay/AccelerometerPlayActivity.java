@@ -16,6 +16,9 @@
 
 package com.example.android.accelerometerplay;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -285,6 +288,10 @@ public class AccelerometerPlayActivity extends Activity {
              * CPU resources.
              */
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+            new Timer().schedule(new TimerTask() {
+                @Override
+                public void run() { stopSimulation(); }
+            }, 5000);
         }
 
         public void stopSimulation() {
