@@ -36,6 +36,7 @@ import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.util.DisplayMetrics;
 import android.view.Display;
+import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
@@ -147,13 +148,13 @@ public class AccelerometerPlayActivity extends Activity {
 
 		private boolean mRunning;
 
-		private int mTotalCount = 0;
-		private int mFailCount = 0;
+		private int mTotalCount;
+		private int mFailCount;
 
 		private Bitmap mResultWasted;
 		private Bitmap mResultSober;
 
-        /*
+		/*
          * Each of our particle holds its previous and current position, its
          * acceleration. for added realism each particle has its own friction
          * coefficient.
@@ -299,6 +300,8 @@ public class AccelerometerPlayActivity extends Activity {
              * CPU resources.
              */
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+			mTotalCount = 0;
+			mFailCount = 0;
             mRunning = true;
 
             new Timer().schedule(new TimerTask() {
@@ -310,6 +313,15 @@ public class AccelerometerPlayActivity extends Activity {
         public void stopSimulation() {
             mSensorManager.unregisterListener(this);
             mRunning = false;
+        }
+
+        @Override
+		public boolean onTouchEvent(MotionEvent event) {
+			if(!mRunning) {
+				startSimulation();
+				return true;
+			}
+			return false;
         }
 
         public SimulationView(Context context) {
