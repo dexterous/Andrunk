@@ -428,15 +428,17 @@ public class AccelerometerPlayActivity extends Activity {
 
             canvas.drawBitmap(mFixedBall, mXCenter - (sBallDiameter * mMetersToPixelsX / 2f), mYCenter - (sBallDiameter * mMetersToPixelsY / 2f), null);
 
+            float sobrietyRadius = 100f;
+
             Paint paint = new Paint();
             paint.setColor(Color.LTGRAY);
             paint.setStrokeWidth(3f);
             paint.setStyle(Paint.Style.STROKE);
-			canvas.drawCircle(mXCenter, mYCenter, 50f, paint);
+			canvas.drawCircle(mXCenter, mYCenter, sobrietyRadius, paint);
 
 			if(mSimulationView.mRunning) {
 				mTotalCount ++;
-				if(distanceBetween(x, y, mXCenter, mYCenter) > 50) {
+				if(distanceBetween(x, y, mXCenter, mYCenter) > sobrietyRadius) {
 					mFailCount ++;
 				}
 			} else {
@@ -448,7 +450,7 @@ public class AccelerometerPlayActivity extends Activity {
         }
 
         private boolean stillSober(float total, float fail) {
-			return ((fail / total) < 0.6f);
+			return ((fail / total) < 0.5f);
 		}
 
 		private double distanceBetween(float x1, float y1, int x2, int y2) {
