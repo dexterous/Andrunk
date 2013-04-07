@@ -143,6 +143,8 @@ public class AccelerometerPlayActivity extends Activity {
 		private int mYCenter;
 		private int mXCenter;
 
+		private boolean mRunning;
+
         /*
          * Each of our particle holds its previous and current position, its
          * acceleration. for added realism each particle has its own friction
@@ -252,6 +254,7 @@ public class AccelerometerPlayActivity extends Activity {
              * collisions.
              */
             public void update(float sx, float sy, long now) {
+                if(!mRunning) return;
                 // update the system's positions
                 updatePositions(sx, sy, now);
 
@@ -288,6 +291,8 @@ public class AccelerometerPlayActivity extends Activity {
              * CPU resources.
              */
             mSensorManager.registerListener(this, mAccelerometer, SensorManager.SENSOR_DELAY_UI);
+            mRunning = true;
+
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() { stopSimulation(); }
@@ -296,6 +301,7 @@ public class AccelerometerPlayActivity extends Activity {
 
         public void stopSimulation() {
             mSensorManager.unregisterListener(this);
+            mRunning = false;
         }
 
         public SimulationView(Context context) {
