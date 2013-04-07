@@ -117,7 +117,7 @@ public class AccelerometerPlayActivity extends Activity {
         private static final float sBallDiameter = 0.004f;
 
         // friction of the virtual table and air
-        private static final float sFriction = 0.1f;
+        private static final float sFriction = 0.5f;
 
         private Sensor mAccelerometer;
         private long mLastT;
