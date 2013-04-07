@@ -304,7 +304,7 @@ public class AccelerometerPlayActivity extends Activity {
             new Timer().schedule(new TimerTask() {
                 @Override
                 public void run() { stopSimulation(); }
-            }, 5000);
+            }, 7000);
         }
 
         public void stopSimulation() {
@@ -397,8 +397,7 @@ public class AccelerometerPlayActivity extends Activity {
              * draw the background
              */
 
-            //canvas.drawBitmap(mWood, 0, 0, null);
-        	canvas.drawColor(Color.LTGRAY);
+            canvas.drawBitmap(mWood, 0, 0, null);
 
             /*
              * compute the new position of our object, based on accelerometer
@@ -430,7 +429,7 @@ public class AccelerometerPlayActivity extends Activity {
             canvas.drawBitmap(mFixedBall, mXCenter - (sBallDiameter * mMetersToPixelsX / 2f), mYCenter - (sBallDiameter * mMetersToPixelsY / 2f), null);
 
             Paint paint = new Paint();
-            paint.setColor(Color.DKGRAY);
+            paint.setColor(Color.LTGRAY);
             paint.setStrokeWidth(3f);
             paint.setStyle(Paint.Style.STROKE);
 			canvas.drawCircle(mXCenter, mYCenter, 50f, paint);
@@ -449,7 +448,7 @@ public class AccelerometerPlayActivity extends Activity {
         }
 
         private boolean stillSober(float total, float fail) {
-			return ((fail / total) < 0.5f);
+			return ((fail / total) < 0.6f);
 		}
 
 		private double distanceBetween(float x1, float y1, int x2, int y2) {
