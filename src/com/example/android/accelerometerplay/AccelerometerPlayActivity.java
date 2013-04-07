@@ -23,8 +23,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.BitmapFactory.Options;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -127,8 +129,8 @@ public class AccelerometerPlayActivity extends Activity {
         private float mYDpi;
         private float mMetersToPixelsX;
         private float mMetersToPixelsY;
-        private Bitmap mBitmap;
-        private Bitmap mBitmap1;
+        private Bitmap mFloatBall;
+        private Bitmap mFixedBall;
         private Bitmap mWood;
         private float mXOrigin;
         private float mYOrigin;
@@ -144,6 +146,12 @@ public class AccelerometerPlayActivity extends Activity {
 		private int mXCenter;
 
 		private boolean mRunning;
+
+		private int mTotalCount = 0;
+		private int mFailCount = 0;
+
+		private Bitmap mResultWasted;
+		private Bitmap mResultSober;
 
         /*
          * Each of our particle holds its previous and current position, its
@@ -319,8 +327,14 @@ public class AccelerometerPlayActivity extends Activity {
             Bitmap ball = BitmapFactory.decodeResource(getResources(), R.drawable.ball);
             final int dstWidth = (int) (sBallDiameter * mMetersToPixelsX + 0.5f);
             final int dstHeight = (int) (sBallDiameter * mMetersToPixelsY + 0.5f);
-            mBitmap = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
-            mBitmap1 = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
+            mFloatBall = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
+            mFixedBall = Bitmap.createScaledBitmap(ball, dstWidth, dstHeight, true);
+
+            Bitmap wasted = BitmapFactory.decodeResource(getResources(), R.drawable.wasted);
+            mResultWasted = Bitmap.createScaledBitmap(wasted, 49, 167, true);
+
+            Bitmap sober = BitmapFactory.decodeResource(getResources(), R.drawable.sober);
+            mResultSober = Bitmap.createScaledBitmap(sober, 45, 222, true);
 
             Options opts = new Options();
             opts.inDither = true;
@@ -332,8 +346,8 @@ public class AccelerometerPlayActivity extends Activity {
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             // compute the origin of the screen relative to the origin of
             // the bitmap
-            mXOrigin = (w - mBitmap.getWidth()) * 0.5f;
-            mYOrigin = (h - mBitmap.getHeight()) * 0.5f;
+            mXOrigin = (w - mFloatBall.getWidth()) * 0.5f;
+            mYOrigin = (h - mFloatBall.getHeight()) * 0.5f;
             mHorizontalBound = ((w / mMetersToPixelsX - sBallDiameter) * 0.5f);
             mVerticalBound = ((h / mMetersToPixelsY - sBallDiameter) * 0.5f);
             mXCenter = w / 2;
@@ -383,7 +397,8 @@ public class AccelerometerPlayActivity extends Activity {
              * draw the background
              */
 
-            canvas.drawBitmap(mWood, 0, 0, null);
+            //canvas.drawBitmap(mWood, 0, 0, null);
+        	canvas.drawColor(Color.LTGRAY);
 
             /*
              * compute the new position of our object, based on accelerometer
@@ -401,7 +416,7 @@ public class AccelerometerPlayActivity extends Activity {
             final float yc = mYOrigin;
             final float xs = mMetersToPixelsX;
             final float ys = mMetersToPixelsY;
-            final Bitmap bitmap = mBitmap;
+            final Bitmap bitmap = mFloatBall;
             /*
              * We transform the canvas so that the coordinate system matches
              * the sensors coordinate system with the origin in the center
@@ -411,13 +426,37 @@ public class AccelerometerPlayActivity extends Activity {
             final float x = xc + particleSystem.getPosX() * xs;
             final float y = yc - particleSystem.getPosY() * ys;
             canvas.drawBitmap(bitmap, x, y, null);
-            canvas.drawBitmap(mBitmap1, mXCenter, mYCenter, null);
+
+            canvas.drawBitmap(mFixedBall, mXCenter - (sBallDiameter * mMetersToPixelsX / 2f), mYCenter - (sBallDiameter * mMetersToPixelsY / 2f), null);
+
+            Paint paint = new Paint();
+            paint.setColor(Color.DKGRAY);
+            paint.setStrokeWidth(3f);
+            paint.setStyle(Paint.Style.STROKE);
+			canvas.drawCircle(mXCenter, mYCenter, 50f, paint);
+
+			if(mSimulationView.mRunning) {
+				mTotalCount ++;
+				if(distanceBetween(x, y, mXCenter, mYCenter) > 50) {
+					mFailCount ++;
+				}
+			} else {
+				canvas.drawBitmap(stillSober(mTotalCount, mFailCount) ? mResultSober : mResultWasted, 50f, 50f, null);
+			}
 
             // and make sure to redraw asap
             invalidate();
         }
 
-        @Override
+        private boolean stillSober(float total, float fail) {
+			return ((fail / total) < 0.5f);
+		}
+
+		private double distanceBetween(float x1, float y1, int x2, int y2) {
+			return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+		}
+
+		@Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
         }
     }
